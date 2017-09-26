@@ -20,9 +20,11 @@ public class InAlipayEnterExecutor implements ActionExecutor {
 
     /** 业务参数 */
     private JSONObject bizContent;
+    private String APP_ID;
 
-    public InAlipayEnterExecutor(JSONObject bizContent) {
+    public InAlipayEnterExecutor(JSONObject bizContent, String APP_ID) {
         this.bizContent = bizContent;
+        this.APP_ID = APP_ID;
     }
 
     public InAlipayEnterExecutor() {
@@ -52,6 +54,6 @@ public class InAlipayEnterExecutor implements ActionExecutor {
         //取得发起请求的支付宝账号id
         String fromUserId = bizContent.getString("FromUserId");
 
-        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId);
+        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId, APP_ID);
     }
 }

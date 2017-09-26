@@ -18,9 +18,11 @@ public class InAlipayFollowExecutor implements ActionExecutor {
 
     /** 业务参数 */
     private JSONObject bizContent;
+    private String APP_ID;
 
-    public InAlipayFollowExecutor(JSONObject bizContent) {
+    public InAlipayFollowExecutor(JSONObject bizContent, String APP_ID) {
         this.bizContent = bizContent;
+        this.APP_ID = APP_ID;
     }
 
     public InAlipayFollowExecutor() {
@@ -35,6 +37,6 @@ public class InAlipayFollowExecutor implements ActionExecutor {
         // 直接构造简单响应结果返回
         final String fromUserId = bizContent.getString("FromUserId");
 
-        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId);
+        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId, APP_ID);
     }
 }

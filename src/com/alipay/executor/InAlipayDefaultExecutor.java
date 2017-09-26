@@ -4,10 +4,9 @@
  */
 package com.alipay.executor;
 
-import net.sf.json.JSONObject;
-
 import com.alipay.common.MyException;
 import com.alipay.util.AlipayMsgBuildUtil;
+import net.sf.json.JSONObject;
 
 /**
  * 默认执行器(该执行器仅发送ack响应)
@@ -19,9 +18,11 @@ public class InAlipayDefaultExecutor implements ActionExecutor {
 
     /** 业务参数 */
     private JSONObject bizContent;
+    private String APP_ID;
 
-    public InAlipayDefaultExecutor(JSONObject bizContent) {
+    public InAlipayDefaultExecutor(JSONObject bizContent, String APP_ID) {
         this.bizContent = bizContent;
+        this.APP_ID = APP_ID;
     }
 
     public InAlipayDefaultExecutor() {
@@ -38,6 +39,6 @@ public class InAlipayDefaultExecutor implements ActionExecutor {
         //取得发起请求的支付宝账号id
         final String fromUserId = bizContent.getString("FromUserId");
 
-        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId);
+        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId, APP_ID);
     }
 }

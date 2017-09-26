@@ -30,14 +30,16 @@ public class InAlipayDIYQRCodeEnterExecutor implements ActionExecutor {
     /** 业务参数 */
     private JSONObject             bizContent;
     private AlipayClient alipayClient = null;
+    private String APP_ID;
 
-    public InAlipayDIYQRCodeEnterExecutor(JSONObject bizContent) {
+    private InAlipayDIYQRCodeEnterExecutor(JSONObject bizContent) {
         this.bizContent = bizContent;
     }
 
-    public InAlipayDIYQRCodeEnterExecutor(AlipayClient alipayClient) {
-        super();
+    public InAlipayDIYQRCodeEnterExecutor(JSONObject bizContent, AlipayClient alipayClient, String APP_ID) {
+        this(bizContent);
         this.alipayClient = alipayClient;
+        this.APP_ID = APP_ID;
     }
 
 
@@ -57,7 +59,7 @@ public class InAlipayDIYQRCodeEnterExecutor implements ActionExecutor {
             final String fromUserId = bizContent.getString("FromUserId");
 
             //1. 首先同步构建ACK响应
-            syncResponseMsg = AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId);
+            syncResponseMsg = AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId, APP_ID);
             
             //2. 异步发送消息，根据不同的sceneId推送不同的消息（这里的sceneId的意义由商户自己定义）
             if("1".equals(sceneId)){

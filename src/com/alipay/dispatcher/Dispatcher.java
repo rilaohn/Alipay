@@ -32,6 +32,16 @@ import com.alipay.executor.InAlipayVerifyExecutor;
  */
 public class Dispatcher {
 
+    private AlipayClient alipayClient = null;
+    private String PUBLIC_KEY = null;
+    private String APP_ID;
+
+    public Dispatcher(AlipayClient alipayClient, String PUBLIC_KEY, String APP_ID) {
+        this.alipayClient = alipayClient;
+        this.PUBLIC_KEY = PUBLIC_KEY;
+        this.APP_ID = APP_ID;
+    }
+
     /**
      * 根据业务参数获取业务执行器
      * 
@@ -39,7 +49,7 @@ public class Dispatcher {
      * @return
      * @throws MyException
      */
-    public static ActionExecutor getExecutor(Map<String, String> params, AlipayClient alipayClient) throws MyException {
+    public ActionExecutor getExecutor(Map<String, String> params) throws MyException {
         //获取服务信息
         String service = params.get("service");
         if (StringUtils.isEmpty(service)) {
@@ -64,7 +74,7 @@ public class Dispatcher {
         //  2.1 纯文本聊天类型
         if ("text".equals(msgType)) {
 
-            return new InAlipayChatTextExecutor(bizContentJson, alipayClient);
+            return new InAlipayChatTextExecutor(bizContentJson, alipayClient, APP_ID);
 
             // 2.2 事件类型
         } else if ("event".equals(msgType)) {
@@ -74,7 +84,7 @@ public class Dispatcher {
         } else {
 
             // 2.3 后续支付宝还会新增其他类型，因此默认返回ack应答
-            return new InAlipayDefaultExecutor(bizContentJson);
+            return new InAlipayDefaultExecutor(bizContentJson, APP_ID);
         }
 
     }
@@ -87,7 +97,7 @@ public class Dispatcher {
      * @return
      * @throws MyException
      */
-    private static ActionExecutor getEventExecutor(String service, JSONObject bizContentJson)
+    private ActionExecutor getEventExecutor(String service, JSONObject bizContentJson)
                                                                                              throws MyException {
         // 1. 获取事件类型
         String eventType = bizContentJson.getString("EventType");
@@ -101,7 +111,7 @@ public class Dispatcher {
         if (AlipayServiceNameConstants.ALIPAY_CHECK_SERVICE.equals(service)
             && eventType.equals(AlipayServiceEventConstants.VERIFYGW_EVENT)) {
 
-            return new InAlipayVerifyExecutor();
+            return new InAlipayVerifyExecutor(PUBLIC_KEY);
 
             // 2.2 其他消息通知类 
         } else if (AlipayServiceNameConstants.ALIPAY_PUBLIC_MESSAGE_NOTIFY.equals(service)) {
@@ -110,7 +120,7 @@ public class Dispatcher {
 
             // 2.3 对于后续支付宝可能新增的类型，统一默认返回AKC响应
         } else {
-            return new InAlipayDefaultExecutor(bizContentJson);
+            return new InAlipayDefaultExecutor(bizContentJson, APP_ID);
         }
     }
 
@@ -122,17 +132,17 @@ public class Dispatcher {
      * @return
      * @throws MyException
      */
-    private static ActionExecutor getMsgNotifyExecutor(String eventType, JSONObject bizContentJson)
+    private ActionExecutor getMsgNotifyExecutor(String eventType, JSONObject bizContentJson)
                                                                                                    throws MyException {
         if (eventType.equals(AlipayServiceEventConstants.FOLLOW_EVENT)) {
 
             // 服务窗关注事件
-            return new InAlipayFollowExecutor(bizContentJson);
+            return new InAlipayFollowExecutor(bizContentJson, APP_ID);
 
         } else if (eventType.equals(AlipayServiceEventConstants.UNFOLLOW_EVENT)) {
 
             //  服务窗取消关注事件
-            return new InAlipayUnFollowExecutor(bizContentJson);
+            return new InAlipayUnFollowExecutor(bizContentJson, APP_ID);
 
             //根据actionParam进行执行器的转发
         } else if (eventType.equals(AlipayServiceEventConstants.CLICK_EVENT)) {
@@ -148,7 +158,7 @@ public class Dispatcher {
         } else {
 
             // 对于后续支付宝可能新增的类型，统一默认返回AKC响应
-            return new InAlipayDefaultExecutor(bizContentJson);
+            return new InAlipayDefaultExecutor(bizContentJson, APP_ID);
         }
 
     }
@@ -159,7 +169,7 @@ public class Dispatcher {
      * @param bizContentJson
      * @return
      */
-    private static ActionExecutor getEnterEventTypeExecutor(JSONObject bizContentJson) {
+    private ActionExecutor getEnterEventTypeExecutor(JSONObject bizContentJson) {
         try {
 
             JSONObject param = JSONObject.fromObject(bizContentJson.get("ActionParam"));
@@ -168,15 +178,15 @@ public class Dispatcher {
             if (!StringUtils.isEmpty(scene.getString("sceneId"))) {
 
                 //自定义场景参数进入服务窗事件
-                return new InAlipayDIYQRCodeEnterExecutor(bizContentJson);
+                return new InAlipayDIYQRCodeEnterExecutor(bizContentJson, alipayClient, APP_ID);
             } else {
 
                 //普通进入服务窗事件
-                return new InAlipayEnterExecutor(bizContentJson);
+                return new InAlipayEnterExecutor(bizContentJson, APP_ID);
             }
         } catch (Exception exception) {
             //无法解析sceneId的情况作为普通进入服务窗事件
-            return new InAlipayEnterExecutor(bizContentJson);
+            return new InAlipayEnterExecutor(bizContentJson, APP_ID);
         }
     }
 
@@ -186,7 +196,7 @@ public class Dispatcher {
      * @param bizContentJson
      * @return
      */
-    private static ActionExecutor getClickEventExecutor(JSONObject bizContentJson) {
+    private ActionExecutor getClickEventExecutor(JSONObject bizContentJson) {
 
         String actionParam = bizContentJson.getString("ActionParam");
 

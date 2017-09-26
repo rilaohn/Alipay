@@ -27,13 +27,15 @@ public class InAlipayChatTextExecutor implements ActionExecutor {
     /** 线程池 */
     private static ExecutorService executors = Executors.newSingleThreadExecutor();
     private AlipayClient alipayClient = null;
+    private String APP_ID;
 
     /** 业务参数 */
     private JSONObject             bizContent;
 
-    public InAlipayChatTextExecutor(JSONObject bizContent, AlipayClient alipayClient) {
+    public InAlipayChatTextExecutor(JSONObject bizContent, AlipayClient alipayClient, String APP_ID) {
         this.bizContent = bizContent;
         this.alipayClient = alipayClient;
+        this.APP_ID = APP_ID;
     }
 
     public InAlipayChatTextExecutor() {
@@ -51,7 +53,7 @@ public class InAlipayChatTextExecutor implements ActionExecutor {
         final String fromUserId = bizContent.getString("FromUserId");
 
         //1. 首先同步构建ACK响应
-        String syncResponseMsg = AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId);
+        String syncResponseMsg = AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId, APP_ID);
 
         //2. 异步发送消息
         executors.execute(new Runnable() {

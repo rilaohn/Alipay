@@ -6,7 +6,6 @@ package com.alipay.factory;
 
 import com.alipay.api.AlipayClient;
 import com.alipay.api.DefaultAlipayClient;
-import com.alipay.constants.AlipayServiceEnvConstants;
 
 
 /**

@@ -1669,7 +1669,8 @@ public class AliTool {
 			verifySign(requestParamsMap);
 
 			//3. 获取业务执行器   根据请求中的 service, msgType, eventType, actionParam 确定执行器
-			ActionExecutor executor = Dispatcher.getExecutor(requestParamsMap, getAlipayClient("JSON"));
+			Dispatcher dispatcher = new Dispatcher(getAlipayClient("JSON"), PUBLIC_KEY, APP_ID);
+			ActionExecutor executor = dispatcher.getExecutor(requestParamsMap);
 
 			//4. 执行业务逻辑
 			responseMsg = executor.execute();

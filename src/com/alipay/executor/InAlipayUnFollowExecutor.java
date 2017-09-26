@@ -18,9 +18,11 @@ public class InAlipayUnFollowExecutor implements ActionExecutor {
 
     /** 业务参数 */
     private JSONObject bizContent;
+    private String APP_ID;
 
-    public InAlipayUnFollowExecutor(JSONObject bizContent) {
+    public InAlipayUnFollowExecutor(JSONObject bizContent, String APP_ID) {
         this.bizContent = bizContent;
+        this.APP_ID = APP_ID;
     }
 
     public InAlipayUnFollowExecutor() {
@@ -36,6 +38,6 @@ public class InAlipayUnFollowExecutor implements ActionExecutor {
         //TODO 根据支付宝请求参数，开发者可以删除之前保存的本地支付宝UID-服务窗ID的关注关系
         // 这里只是个样例程序，所以这步省略。
 
-        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId);
+        return AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId, APP_ID);
     }
 }

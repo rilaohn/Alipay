@@ -31,14 +31,16 @@ public class InAlipayAsyncMsgSendExecutor implements ActionExecutor {
     /** 业务参数 */
     private JSONObject             bizContent;
     private AlipayClient alipayClient = null;
+    private String APP_ID;
 
     public InAlipayAsyncMsgSendExecutor(JSONObject bizContent) {
         this.bizContent = bizContent;
     }
 
-    public InAlipayAsyncMsgSendExecutor(AlipayClient alipayClient) {
+    public InAlipayAsyncMsgSendExecutor(AlipayClient alipayClient, String APP_ID) {
         super();
         this.alipayClient = alipayClient;
+        this.APP_ID = APP_ID;
     }
 
     @Override
@@ -48,7 +50,7 @@ public class InAlipayAsyncMsgSendExecutor implements ActionExecutor {
         final String fromUserId = bizContent.getString("FromUserId");
 
         //1. 首先同步响应一个消息
-        String syncResponseMsg = AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId);
+        String syncResponseMsg = AlipayMsgBuildUtil.buildBaseAckMsg(fromUserId, APP_ID);
 
         //2. 异步发送消息
         executors.execute(new Runnable() {

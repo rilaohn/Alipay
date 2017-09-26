@@ -5,7 +5,6 @@
 package com.alipay.executor;
 
 import com.alipay.common.MyException;
-import com.alipay.constants.AlipayServiceEnvConstants;
 
 /**
  * 开通服务窗开发者功能处理器
@@ -15,7 +14,14 @@ import com.alipay.constants.AlipayServiceEnvConstants;
  */
 public class InAlipayVerifyExecutor implements ActionExecutor {
 
-    /** 
+    private String PUBLIC_KEY;
+
+    public InAlipayVerifyExecutor(String PUBLIC_KEY) {
+        super();
+        this.PUBLIC_KEY = PUBLIC_KEY;
+    }
+
+    /**
      * @see com.alipay.executor.ActionExecutor#executor(java.util.Map)
      */
     @Override
@@ -32,7 +38,7 @@ public class InAlipayVerifyExecutor implements ActionExecutor {
         //固定响应格式，必须按此格式返回
         StringBuilder builder = new StringBuilder();
         builder.append("<success>").append(Boolean.TRUE.toString()).append("</success>");
-        builder.append("<biz_content>").append(AlipayServiceEnvConstants.PUBLIC_KEY)
+        builder.append("<biz_content>").append(PUBLIC_KEY)
             .append("</biz_content>");
         return builder.toString();
     }
